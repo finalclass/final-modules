@@ -1,0 +1,1 @@
+{"version":3,"sources":["public/src/app/src/application/application.styl","public/src/app/src/mainMenu/mainMenu.styl"],"names":[],"mappings":"AAAA;EACE,YAAY,KAAZ;;;ACDF;EACE,YAAY,KAAZ;EACA,OAAO,KAAP","file":"app.css","sourcesContent":["body {\n  background: #eee;\n}","nav {\n  background: #ddd;\n  color: #333;\n}"],"sourceRoot":"/source/"}

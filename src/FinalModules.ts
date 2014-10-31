@@ -3,6 +3,9 @@
 import FinalModule = require('./FinalModule');
 import IGulp = require('./IGulp');
 import path = require('path');
+import fs = require('fs');
+import DependencyResolver = require('dependency-resolver');
+
 var wrap:(...args:any[])=>any = require('gulp-wrap');
 var concat:(...args:any[])=>any = require('gulp-concat');
 var tsc:(...args:any[])=>any = require('gulp-tsc');
@@ -10,17 +13,23 @@ var uglify:(...args:any[])=>any = require('gulp-uglifyjs');
 var stylus:(...args:any[])=>any = require('gulp-stylus');
 var nib:(...args:any[])=>any = require('nib');
 var sourcemaps:any = require('gulp-sourcemaps');
+var runSequence:(...args:any[])=>any = require('run-sequence');
 
 class FinalModules {
 
   private modules:{[name:string]:FinalModule} = {};
+  private modulesInverted:DependencyResolver;
 
   constructor(private modulesPath:string = 'public/src') {
-
+    this.modulesInverted = new DependencyResolver();
   }
 
   public add(name:string, dependencies:string[] = []):void {
     this.modules[name] = new FinalModule(name, dependencies);
+    this.modulesInverted.add(name);
+    dependencies.forEach((dep:string):void => {
+      this.modulesInverted.setDependency(dep, name);
+    });
   }
 
   private map<T>(func:(mod:FinalModule)=>T):T[] {
@@ -31,16 +40,24 @@ class FinalModules {
     this.map((mod:FinalModule):void => {
       gulp.task(mod.name + ':html', this.getHtmlTask(gulp, mod));
       gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), this.getTsTask(gulp, mod));
+      gulp.task(mod.name + ':ts:standalone', this.getTsTask(gulp, mod));
       gulp.task(mod.name + ':min', [mod.name + ':ts'], this.getMinTask(gulp, mod));
+      gulp.task(mod.name + ':min:standalone', [mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
       gulp.task(mod.name + ':styl', this.getStylTask(gulp, mod));
-      gulp.task(mod.name + ':watch', this.getWatchTask(gulp, mod));
+      gulp.task(mod.name + ':watch:ts', this.getWatchTsTask(gulp, mod));
+      gulp.task(mod.name + ':watch:styl', this.getWatchStylTask(gulp, mod));
+      gulp.task(mod.name + ':watch:html', this.getWatchHtmlTask(gulp, mod));
+      gulp.task(mod.name + ':watch', [mod.name + ':watch:ts', mod.name + ':watch:styl', mod.name + ':watch:html']);
     });
 
     gulp.task('fm:html', this.map((mod:FinalModule):string => mod.name + ':html'));
     gulp.task('fm:ts', this.map((mod:FinalModule):string => mod.name + ':ts'));
     gulp.task('fm:min', this.map((mod:FinalModule):string => mod.name + ':min'));
     gulp.task('fm:styl', this.map((mod:FinalModule):string => mod.name + ':styl'));
-    gulp.task('fm:watch', this.map((mod:FinalModule):string => mod.name + ':watch'));
+    gulp.task('fm:watch:ts', this.map((mod:FinalModule):string => mod.name + ':watch:ts'));
+    gulp.task('fm:watch:styl', this.map((mod:FinalModule):string => mod.name + ':watch:styl'));
+    gulp.task('fm:watch:html', this.map((mod:FinalModule):string => mod.name + ':watch:html'));
+    gulp.task('fm:watch', ['fm:watch:ts', 'fm:watch:styl', 'fm:watch:html']);
     gulp.task('fm', ['fm:styl', 'fm:min', 'fm:html', 'fm:watch']);
   }
 
@@ -59,11 +76,27 @@ class FinalModules {
       .replace(/\'/g, '\\\'');
   }
 
-  private getWatchTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
+  private getWatchTsTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
     return ():void => {
-      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.ts', [mod.name + ':min']);
-      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.html', [mod.name + ':html']);
+      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.ts', ():void => {
+        var tasks:string[] = this.modulesInverted.resolve(mod.name)
+          .reverse()
+          .map((m:string):string => m + ':min:standalone');
+
+        runSequence.apply(runSequence, tasks);
+      });
+    };
+  }
+
+  private getWatchStylTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
+    return ():void => {
       gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.styl', [mod.name + ':styl']);
+    };
+  }
+
+  private getWatchHtmlTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
+    return ():void => {
+      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.html', [mod.name + ':html']);
     };
   }
 
@@ -92,10 +125,20 @@ class FinalModules {
 
   private getMinTask(gulp:IGulp.Gulp, mod:FinalModule):()=>NodeJS.ReadWriteStream {
     return ():NodeJS.ReadWriteStream => {
+
+      var inSourceMapPath:string = this.modulesPath + '/'
+        + mod.name + '/build/' + mod.name + '.js.map';
+
       return gulp.src([this.modulesPath + '/' + mod.name + '/build/' + mod.name + '.js'])
         .pipe(uglify(mod.name + '.min.js', {
-          inSourceMap: this.modulesPath + '/' + mod.name + '/build/' + mod.name + '.js.map',
-          outSourceMap: true
+          outSourceMap: true,
+          output: {
+            source_map: {
+              file: mod.name + '.min.js',
+              root: '',
+              orig: fs.readFileSync(inSourceMapPath).toString()
+            }
+          }
         }))
         .pipe(gulp.dest(this.modulesPath + '/' + mod.name + '/build/'));
     };
@@ -115,6 +158,7 @@ class FinalModules {
           target: 'ES5',
           outDir: outDir,
           sourcemap: true,
+          sourceRoot: '',
           declaration: true,
           out: mod.name + '.js'
         }))

@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "description": "FinalModules is a gulp task generator helper class. Convention over Configuration",
   "main": "build/FinalModules.js",
-  "scripts": {
-
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git@github.com:finalclass/final-modules.git"
@@ -24,6 +22,7 @@
     "nib": "~1.0.4",
     "gulp-stylus": "~1.3.3",
     "gulp-concat": "~2.4.1",
-    "gulp-sourcemaps": "~1.2.4"
+    "gulp-sourcemaps": "~1.2.4",
+    "dependency-resolver": "~2.0.0"
   }
 }

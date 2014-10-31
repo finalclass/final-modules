@@ -2,7 +2,6 @@
 var FinalModule = require('./FinalModule');
 var path = require('path');
 var fs = require('fs');
-var DependencyResolver = require('dependency-resolver');
 var wrap = require('gulp-wrap');
 var concat = require('gulp-concat');
 var tsc = require('gulp-tsc');
@@ -10,22 +9,15 @@ var uglify = require('gulp-uglifyjs');
 var stylus = require('gulp-stylus');
 var nib = require('nib');
 var sourcemaps = require('gulp-sourcemaps');
-var runSequence = require('run-sequence');
 var FinalModules = (function () {
     function FinalModules(modulesPath) {
         if (modulesPath === void 0) { modulesPath = 'public/src'; }
         this.modulesPath = modulesPath;
         this.modules = {};
-        this.modulesInverted = new DependencyResolver();
     }
     FinalModules.prototype.add = function (name, dependencies) {
-        var _this = this;
         if (dependencies === void 0) { dependencies = []; }
         this.modules[name] = new FinalModule(name, dependencies);
-        this.modulesInverted.add(name);
-        dependencies.forEach(function (dep) {
-            _this.modulesInverted.setDependency(dep, name);
-        });
     };
     FinalModules.prototype.map = function (func) {
         var _this = this;
@@ -49,10 +41,7 @@ var FinalModules = (function () {
         gulp.task('fm:ts', this.map(function (mod) { return mod.name + ':ts'; }));
         gulp.task('fm:min', this.map(function (mod) { return mod.name + ':min'; }));
         gulp.task('fm:styl', this.map(function (mod) { return mod.name + ':styl'; }));
-        gulp.task('fm:watch:ts', this.map(function (mod) { return mod.name + ':watch:ts'; }));
-        gulp.task('fm:watch:styl', this.map(function (mod) { return mod.name + ':watch:styl'; }));
-        gulp.task('fm:watch:html', this.map(function (mod) { return mod.name + ':watch:html'; }));
-        gulp.task('fm:watch', ['fm:watch:ts', 'fm:watch:styl', 'fm:watch:html']);
+        gulp.task('fm:watch', this.map(function (mod) { return mod.name + ':watch'; }));
         gulp.task('fm', ['fm:styl', 'fm:min', 'fm:html', 'fm:watch']);
     };
     FinalModules.varNameFilter = function (filePath) {
@@ -66,10 +55,7 @@ var FinalModules = (function () {
     FinalModules.prototype.getWatchTsTask = function (gulp, mod) {
         var _this = this;
         return function () {
-            gulp.watch(_this.modulesPath + '/' + mod.name + '/src/**/*.ts', function () {
-                var tasks = _this.modulesInverted.resolve(mod.name).reverse().map(function (m) { return m + ':min:standalone'; });
-                runSequence.apply(runSequence, tasks);
-            });
+            gulp.watch(_this.modulesPath + '/' + mod.name + '/src/**/*.ts', [mod.name + ':ts:dependent']);
         };
     };
     FinalModules.prototype.getWatchStylTask = function (gulp, mod) {

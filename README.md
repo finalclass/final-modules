@@ -18,7 +18,7 @@ You should create in your public directory a place for your final-modules, let i
     public
     └── src
         ├── app
-        └── core
+        ── core
 
 Then inside of every module your code should go to `src` directory:
 
@@ -74,14 +74,17 @@ Another think about TypeScript in FinalModules is usage of amd/commonjs modules.
 
 ### HTML
 
-Every *.html file in the module's src directory will be placed in moduleName.html.js file as a variable.
+Every \*.html file in the module's src directory will be placed in moduleName.html.js file as a variable.
  For example, to content of the application.html file is inside of a variable: `app.html.application`,
  content of a footer.html is inside of a `core.html.footer` variable.
 
 ### Stylus
 
-Every *.styl file found in the module's src directory will be compiled with stylus (with nib plugin) and merged into one moduleName.css file with the coresponding map file.
+Every \*.styl file found in the module's src directory will be compiled with stylus (with nib plugin) and merged into one moduleName.css file with the coresponding map file.
 
+### Watching TypeScript
+
+The `*:watch:ts` tasks are watching only the tasks of a particular module but when the change occures their run a compilation of every module that is dependent upon the changed module. FinalModules resolves dependencies using [dependency-resolver](https://www.npmjs.org/package/dependency-resolver "dependency-resolver") node package.
 
 ## Usage
 
@@ -101,9 +104,9 @@ inside your `gulpfile.js`:
     
 This code will generate these gulp tasks: 
 
-- for core module: `core`, `core:html`, `core:ts`, `core:min`, `core:styl`, `core:watch`
-- for fc module: `fc`, `fc:html`, `fc:ts`, `fc:min`, `fc:styl`, `fc:watch`
-- for all the modules: `fm`, `fm:html`, `fm:ts`, `fm:min`, `fm:styl`, `fm:watch`
+- for core module: `core`, `core:html`, `core:ts`, `core:ts:standalone`, `core:min`, `core:styl`, `core:watch`, `core:watch:ts`, `core:watch:styl`, `core:watch:html`
+- for fc module: `fc`, `fc:html`, `fc:ts`, `fc:min`, `fc:styl`, `fc:watch`, `fc:watch:ts`, `fc:watch:styl`, `fs:watch:html`
+- for all the modules: `fm`, `fm:html`, `fm:ts`, `fm:min`, `fm:styl`, `fm:watch`, `fm:watch:ts`, `fm:watch:styl`, `fm:watch:html`
 
 so you can add a default task that will run all the generated tasks with this statement:
  
