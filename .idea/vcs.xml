@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/node_modules/gulp-tsc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/node_modules/gulp-uglifyjs" vcs="Git" />
   </component>
 </project>
