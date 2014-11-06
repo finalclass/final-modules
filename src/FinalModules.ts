@@ -104,7 +104,7 @@ class FinalModules {
     return ():NodeJS.ReadWriteStream => {
       return gulp.src([this.modulesPath + '/' + mod.name + '/src/**/*.styl'])
         .pipe(stylus({
-          use: [nib()],
+          use: nib(),
           sourcemap: {
             inline: true,
             sourceRoot: '',
