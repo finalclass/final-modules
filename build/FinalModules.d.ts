@@ -4,6 +4,7 @@ declare class FinalModules {
     private modulesPath;
     private modules;
     private modulesInverted;
+    private sequence;
     constructor(modulesPath?: string);
     add(name: string, dependencies?: string[]): void;
     private map<T>(func);

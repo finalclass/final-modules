@@ -33,11 +33,13 @@ var FinalModules = (function () {
     };
     FinalModules.prototype.generateTasks = function (gulp) {
         var _this = this;
+        this.sequence = runSequence.use(gulp);
         this.map(function (mod) {
             gulp.task(mod.name + ':html', _this.getHtmlTask(gulp, mod));
             gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), _this.getTsTask(gulp, mod));
             gulp.task(mod.name + ':ts:standalone', _this.getTsTask(gulp, mod));
             gulp.task(mod.name + ':min', [mod.name + ':ts'], _this.getMinTask(gulp, mod));
+            console.log('######', mod.name + ':min:standalone');
             gulp.task(mod.name + ':min:standalone', [mod.name + ':ts:standalone'], _this.getMinTask(gulp, mod));
             gulp.task(mod.name + ':styl', _this.getStylTask(gulp, mod));
             gulp.task(mod.name + ':watch:ts', _this.getWatchTsTask(gulp, mod));
@@ -68,7 +70,7 @@ var FinalModules = (function () {
         return function () {
             gulp.watch(_this.modulesPath + '/' + mod.name + '/src/**/*.ts', function () {
                 var tasks = _this.modulesInverted.resolve(mod.name).reverse().map(function (m) { return m + ':min:standalone'; });
-                runSequence.apply(runSequence, tasks);
+                _this.sequence.apply(_this.sequence, tasks);
             });
         };
     };

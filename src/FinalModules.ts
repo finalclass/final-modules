@@ -19,6 +19,7 @@ class FinalModules {
 
   private modules:{[name:string]:FinalModule} = {};
   private modulesInverted:DependencyResolver;
+  private sequence:(...args:any[])=>any
 
   constructor(private modulesPath:string = 'public/src') {
     this.modulesInverted = new DependencyResolver();
@@ -37,11 +38,14 @@ class FinalModules {
   }
 
   public generateTasks(gulp:IGulp.Gulp):void {
+    this.sequence = (<any>runSequence).use(gulp);
+
     this.map((mod:FinalModule):void => {
       gulp.task(mod.name + ':html', this.getHtmlTask(gulp, mod));
       gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), this.getTsTask(gulp, mod));
       gulp.task(mod.name + ':ts:standalone', this.getTsTask(gulp, mod));
       gulp.task(mod.name + ':min', [mod.name + ':ts'], this.getMinTask(gulp, mod));
+      console.log('######', mod.name + ':min:standalone');
       gulp.task(mod.name + ':min:standalone', [mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
       gulp.task(mod.name + ':styl', this.getStylTask(gulp, mod));
       gulp.task(mod.name + ':watch:ts', this.getWatchTsTask(gulp, mod));
@@ -83,7 +87,7 @@ class FinalModules {
           .reverse()
           .map((m:string):string => m + ':min:standalone');
 
-        runSequence.apply(runSequence, tasks);
+        this.sequence.apply(this.sequence, tasks);
       });
     };
   }
