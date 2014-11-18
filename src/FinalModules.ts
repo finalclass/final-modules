@@ -168,6 +168,17 @@ class FinalModules {
 
   private getHtmlTask(gulp:IGulp.Gulp, mod:FinalModule):()=>NodeJS.ReadWriteStream {
     return ():NodeJS.ReadWriteStream => {
+      var modNameSplit:string[] = mod.name.split('.');
+      var modVarInit:string;
+
+      var nameAlready:string = modNameSplit[0];
+      modVarInit = 'var $name = $name || {};'.replace(/\$name/g, nameAlready);
+
+      for (var i = 1; i < modNameSplit.length; i += 1) {
+        nameAlready += '.' + modNameSplit[i];
+        modVarInit += '\n$name = $name || {};'.replace(/\$name/g, nameAlready);
+      }
+
       return gulp.src(this.modulesPath + '/' + mod.name + '/src/**/*.html')
         .pipe(wrap('<%=mod.name%>.html.<%= varName(file.path) %> = \'<%=escape(contents)%>\';', {
           mod: mod,
@@ -176,7 +187,7 @@ class FinalModules {
         }))
         .pipe(concat(mod.name + '.html.js'))
         .pipe(wrap(
-          'var <%=mod.name + "=" + mod.name%> || {};\n<%=mod.name%>.html = {};\n\n<%=contents%>',
+          modVarInit + '\n<%=mod.name%>.html = {};\n\n<%=contents%>',
           {mod: mod}
         ))
         .pipe(gulp.dest(this.modulesPath + '/' + mod.name + '/build'));
