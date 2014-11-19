@@ -45,7 +45,6 @@ class FinalModules {
       gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), this.getTsTask(gulp, mod));
       gulp.task(mod.name + ':ts:standalone', this.getTsTask(gulp, mod));
       gulp.task(mod.name + ':min', [mod.name + ':ts'], this.getMinTask(gulp, mod));
-      console.log('######', mod.name + ':min:standalone');
       gulp.task(mod.name + ':min:standalone', [mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
       gulp.task(mod.name + ':styl', this.getStylTask(gulp, mod));
       gulp.task(mod.name + ':watch:ts', this.getWatchTsTask(gulp, mod));

@@ -39,7 +39,6 @@ var FinalModules = (function () {
             gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), _this.getTsTask(gulp, mod));
             gulp.task(mod.name + ':ts:standalone', _this.getTsTask(gulp, mod));
             gulp.task(mod.name + ':min', [mod.name + ':ts'], _this.getMinTask(gulp, mod));
-            console.log('######', mod.name + ':min:standalone');
             gulp.task(mod.name + ':min:standalone', [mod.name + ':ts:standalone'], _this.getMinTask(gulp, mod));
             gulp.task(mod.name + ':styl', _this.getStylTask(gulp, mod));
             gulp.task(mod.name + ':watch:ts', _this.getWatchTsTask(gulp, mod));
