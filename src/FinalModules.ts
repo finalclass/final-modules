@@ -40,6 +40,10 @@ class FinalModules {
   public generateTasks(gulp:IGulp.Gulp):void {
     this.sequence = (<any>runSequence).use(gulp);
 
+    //Check for circular dependencies:
+    //sort() method will throw an error on circular dependencies
+    this.modulesInverted.sort();
+
     this.map((mod:FinalModule):void => {
       gulp.task(mod.name + ':html', this.getHtmlTask(gulp, mod));
       gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), this.getTsTask(gulp, mod));
@@ -85,7 +89,6 @@ class FinalModules {
         var tasks:string[] = this.modulesInverted.resolve(mod.name)
           .reverse()
           .map((m:string):string => m + ':min:standalone');
-
         this.sequence.apply(this.sequence, tasks);
       });
     };

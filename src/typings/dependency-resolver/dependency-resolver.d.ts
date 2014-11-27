@@ -7,6 +7,7 @@ declare module "dependency-resolver" {
     setDependency(serviceName: string, dependencyName: string): void;
     resolve(serviceName: string): string[];
     private recursiveResolve(service, resolved, unresolved);
+    public sort():string[];
   }
 
   export = DependencyResolver;

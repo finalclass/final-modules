@@ -34,6 +34,9 @@ var FinalModules = (function () {
     FinalModules.prototype.generateTasks = function (gulp) {
         var _this = this;
         this.sequence = runSequence.use(gulp);
+        //Check for circular dependencies:
+        //sort() method will throw an error on circular dependencies
+        this.modulesInverted.sort();
         this.map(function (mod) {
             gulp.task(mod.name + ':html', _this.getHtmlTask(gulp, mod));
             gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), _this.getTsTask(gulp, mod));
