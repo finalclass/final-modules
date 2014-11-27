@@ -81,11 +81,11 @@ Every \*.html file in the module's src directory will be placed in moduleName.ht
 
 ### Stylus
 
-Every \*.styl file found in the module's src directory will be compiled with stylus (with nib plugin available) and merged into one moduleName.css file with the coresponding map file.
+Every \*.styl file found in the module's src directory will be compiled with stylus (with nib plugin available) and merged into moduleName.css file with the coresponding map file.
 
 ### Watching TypeScript
 
-The `*:watch:ts` tasks are watching only the tasks of a particular module but when the change occures they run a compilation of every module that is dependent upon the changed module. FinalModules resolves dependencies using [dependency-resolver](https://www.npmjs.org/package/dependency-resolver "dependency-resolver") node package.
+The `fm:*:watch:ts` tasks watch only the files of a particular module but when the change occures they run a compilation of every module that is dependent upon the changed module. FinalModules resolve dependencies using [dependency-resolver](https://www.npmjs.org/package/dependency-resolver "dependency-resolver") node package.
 
 ## Usage
 
@@ -103,13 +103,13 @@ inside your `gulpfile.js`:
     mods.add('app', ['core']);
     mods.generateTasks(gulp);
     
-This code will generate these gulp tasks: 
+This code will generate the following gulp tasks:
 
 - for core module: `fm:core`, `fm:core:clean`, `fm:core:html`, `fm:core:ts`, `fm:core:ts:standalone`, `fm:core:min`, `fm:core:styl`, `fm:core:watch`, `fm:core:watch:ts`, `fm:core:watch:styl`, `fm:core:watch:html`
 - for app module: `fm:app`, `fm:app:clean`, `fm:app:html`, `fm:app:ts`, `fm:app:min`, `fm:app:styl`, `fm:app:watch`, `fm:app:watch:ts`, `fm:app:watch:styl`, `fm:app:watch:html`
 - for all the modules: `fm`, `fm:clean`, `fm:html`, `fm:ts`, `fm:min`, `fm:styl`, `fm:watch`, `fm:watch:ts`, `fm:watch:styl`, `fm:watch:html`
 
-so you can add a default task that will run all the generated tasks with this statement:
+After that you can add a default task that will run all the generated tasks with this statement:
  
     gulp.task('default', ['fm']);
   
@@ -119,7 +119,7 @@ To compile all the final-modules use gulp inside your projects:
  
     gulp fm
     
-This will generate `build` directories inside of each module. In our example this would be like that:
+This will generate `build` directories inside of each module. In our example it looks like that:
 
     public/
     └── src
@@ -163,4 +163,4 @@ This will generate `build` directories inside of each module. In our example thi
                 
 ## License: ISC
 
-ISC is even simple **MIT** like license. See `LICENSE` file.
+ISC is even simpler **MIT** like license. See `LICENSE` file.
