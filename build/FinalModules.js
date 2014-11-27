@@ -43,7 +43,7 @@ var FinalModules = (function () {
             gulp.task('fm:' + mod.name + ':ts', mod.getDeps('fm:', ':ts'), _this.getTsTask(gulp, mod));
             gulp.task('fm:' + mod.name + ':ts:standalone', _this.getTsTask(gulp, mod));
             gulp.task('fm:' + mod.name + ':min', ['fm:' + mod.name + ':ts'], _this.getMinTask(gulp, mod));
-            gulp.task('fm:' + mod.name + ':min:standalone', [mod.name + ':ts:standalone'], _this.getMinTask(gulp, mod));
+            gulp.task('fm:' + mod.name + ':min:standalone', ['fm:' + mod.name + ':ts:standalone'], _this.getMinTask(gulp, mod));
             gulp.task('fm:' + mod.name + ':styl', _this.getStylTask(gulp, mod));
             gulp.task('fm:' + mod.name + ':clean', _this.getCleanTask(gulp, mod));
             gulp.task('fm:' + mod.name + ':watch:ts', _this.getWatchTsTask(gulp, mod));

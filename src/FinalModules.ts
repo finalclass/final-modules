@@ -50,7 +50,7 @@ class FinalModules {
       gulp.task('fm:' + mod.name + ':ts', mod.getDeps('fm:', ':ts'), this.getTsTask(gulp, mod));
       gulp.task('fm:' + mod.name + ':ts:standalone', this.getTsTask(gulp, mod));
       gulp.task('fm:' + mod.name + ':min', ['fm:' + mod.name + ':ts'], this.getMinTask(gulp, mod));
-      gulp.task('fm:' + mod.name + ':min:standalone', [mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':min:standalone', ['fm:' + mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
       gulp.task('fm:' + mod.name + ':styl', this.getStylTask(gulp, mod));
       gulp.task('fm:' + mod.name + ':clean', this.getCleanTask(gulp, mod));
       gulp.task('fm:' + mod.name + ':watch:ts', this.getWatchTsTask(gulp, mod));
