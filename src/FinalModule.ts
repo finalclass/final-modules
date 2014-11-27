@@ -2,8 +2,8 @@ class FinalModule {
 
   constructor(public name:string, public deps:string[]){}
 
-  public getDepsWithSuffix(suffix:string):string[] {
-    return this.deps.map((dep:string):string => dep + suffix);
+  public getDeps(prefix:string, suffix:string):string[] {
+    return this.deps.map((dep:string):string => prefix + dep + suffix);
   }
 
 }

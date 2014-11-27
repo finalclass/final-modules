@@ -3,8 +3,8 @@ var FinalModule = (function () {
         this.name = name;
         this.deps = deps;
     }
-    FinalModule.prototype.getDepsWithSuffix = function (suffix) {
-        return this.deps.map(function (dep) { return dep + suffix; });
+    FinalModule.prototype.getDeps = function (prefix, suffix) {
+        return this.deps.map(function (dep) { return prefix + dep + suffix; });
     };
     return FinalModule;
 })();

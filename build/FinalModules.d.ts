@@ -12,6 +12,7 @@ declare class FinalModules {
     private static varNameFilter(filePath);
     private static escapeString(text);
     private getWatchTsTask(gulp, mod);
+    private getCleanTask(gulp, mod);
     private getWatchStylTask(gulp, mod);
     private getWatchHtmlTask(gulp, mod);
     private getStylTask(gulp, mod);

@@ -14,6 +14,7 @@ var stylus:(...args:any[])=>any = require('gulp-stylus');
 var nib:(...args:any[])=>any = require('nib');
 var sourcemaps:any = require('gulp-sourcemaps');
 var runSequence:(...args:any[])=>any = require('run-sequence');
+var clean:any = require('gulp-clean');
 
 class FinalModules {
 
@@ -45,27 +46,29 @@ class FinalModules {
     this.modulesInverted.sort();
 
     this.map((mod:FinalModule):void => {
-      gulp.task(mod.name + ':html', this.getHtmlTask(gulp, mod));
-      gulp.task(mod.name + ':ts', mod.getDepsWithSuffix(':ts'), this.getTsTask(gulp, mod));
-      gulp.task(mod.name + ':ts:standalone', this.getTsTask(gulp, mod));
-      gulp.task(mod.name + ':min', [mod.name + ':ts'], this.getMinTask(gulp, mod));
-      gulp.task(mod.name + ':min:standalone', [mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
-      gulp.task(mod.name + ':styl', this.getStylTask(gulp, mod));
-      gulp.task(mod.name + ':watch:ts', this.getWatchTsTask(gulp, mod));
-      gulp.task(mod.name + ':watch:styl', this.getWatchStylTask(gulp, mod));
-      gulp.task(mod.name + ':watch:html', this.getWatchHtmlTask(gulp, mod));
-      gulp.task(mod.name + ':watch', [mod.name + ':watch:ts', mod.name + ':watch:styl', mod.name + ':watch:html']);
+      gulp.task('fm:' + mod.name + ':html', this.getHtmlTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':ts', mod.getDeps('fm:', ':ts'), this.getTsTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':ts:standalone', this.getTsTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':min', ['fm:' + mod.name + ':ts'], this.getMinTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':min:standalone', [mod.name + ':ts:standalone'], this.getMinTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':styl', this.getStylTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':clean', this.getCleanTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':watch:ts', this.getWatchTsTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':watch:styl', this.getWatchStylTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':watch:html', this.getWatchHtmlTask(gulp, mod));
+      gulp.task('fm:' + mod.name + ':watch', [mod.name + ':watch:ts', mod.name + ':watch:styl', mod.name + ':watch:html']);
     });
 
-    gulp.task('fm:html', this.map((mod:FinalModule):string => mod.name + ':html'));
-    gulp.task('fm:ts', this.map((mod:FinalModule):string => mod.name + ':ts'));
-    gulp.task('fm:min', this.map((mod:FinalModule):string => mod.name + ':min'));
-    gulp.task('fm:styl', this.map((mod:FinalModule):string => mod.name + ':styl'));
-    gulp.task('fm:watch:ts', this.map((mod:FinalModule):string => mod.name + ':watch:ts'));
-    gulp.task('fm:watch:styl', this.map((mod:FinalModule):string => mod.name + ':watch:styl'));
-    gulp.task('fm:watch:html', this.map((mod:FinalModule):string => mod.name + ':watch:html'));
+    gulp.task('fm:html', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':html'));
+    gulp.task('fm:ts', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':ts'));
+    gulp.task('fm:min', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':min'));
+    gulp.task('fm:styl', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':styl'));
+    gulp.task('fm:clean', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':clean'));
+    gulp.task('fm:watch:ts', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':watch:ts'));
+    gulp.task('fm:watch:styl', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':watch:styl'));
+    gulp.task('fm:watch:html', this.map((mod:FinalModule):string => 'fm:' + mod.name + ':watch:html'));
     gulp.task('fm:watch', ['fm:watch:ts', 'fm:watch:styl', 'fm:watch:html']);
-    gulp.task('fm', ['fm:styl', 'fm:min', 'fm:html', 'fm:watch']);
+    gulp.task('fm', ['fm:clean', 'fm:styl', 'fm:min', 'fm:html', 'fm:watch']);
   }
 
   private static varNameFilter(filePath:string):string {
@@ -83,26 +86,36 @@ class FinalModules {
       .replace(/\'/g, '\\\'');
   }
 
+
+
   private getWatchTsTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
     return ():void => {
       gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.ts', ():void => {
         var tasks:string[] = this.modulesInverted.resolve(mod.name)
           .reverse()
-          .map((m:string):string => m + ':min:standalone');
+          .map((m:string):string => 'fm:' + m + ':min:standalone');
         this.sequence.apply(this.sequence, tasks);
       });
     };
   }
 
+  private getCleanTask(gulp:IGulp.Gulp, mod:FinalModule):()=>NodeJS.ReadWriteStream {
+    return ():NodeJS.ReadWriteStream => {
+      return gulp
+        .src(this.modulesPath + '/' + mod.name + '/build', {read: false})
+        .pipe(clean());
+    };
+  }
+
   private getWatchStylTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
     return ():void => {
-      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.styl', [mod.name + ':styl']);
+      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.styl', ['fm:' + mod.name + ':styl']);
     };
   }
 
   private getWatchHtmlTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
     return ():void => {
-      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.html', [mod.name + ':html']);
+      gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.html', ['fm:' + mod.name + ':html']);
     };
   }
 
