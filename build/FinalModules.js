@@ -9,6 +9,7 @@ var tsc = require('gulp-tsc');
 var uglify = require('gulp-uglifyjs');
 var stylus = require('gulp-stylus');
 var nib = require('nib');
+var plumber = require('gulp-plumber');
 var sourcemaps = require('gulp-sourcemaps');
 var runSequence = require('run-sequence');
 var clean = require('gulp-clean');
@@ -100,7 +101,7 @@ var FinalModules = (function () {
     FinalModules.prototype.getStylTask = function (gulp, mod) {
         var _this = this;
         return function () {
-            return gulp.src([_this.modulesPath + '/' + mod.name + '/src/**/*.styl']).pipe(stylus({
+            return gulp.src([_this.modulesPath + '/' + mod.name + '/src/**/*.styl']).pipe(plumber()).pipe(stylus({
                 use: nib(),
                 sourcemap: {
                     inline: true,

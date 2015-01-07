@@ -12,6 +12,7 @@ var tsc:(...args:any[])=>any = require('gulp-tsc');
 var uglify:(...args:any[])=>any = require('gulp-uglifyjs');
 var stylus:(...args:any[])=>any = require('gulp-stylus');
 var nib:(...args:any[])=>any = require('nib');
+var plumber:(...args:any[])=>any = require('gulp-plumber');
 var sourcemaps:any = require('gulp-sourcemaps');
 var runSequence:(...args:any[])=>any = require('run-sequence');
 var clean:any = require('gulp-clean');
@@ -122,6 +123,7 @@ class FinalModules {
   private getStylTask(gulp:IGulp.Gulp, mod:FinalModule):()=>NodeJS.ReadWriteStream {
     return ():NodeJS.ReadWriteStream => {
       return gulp.src([this.modulesPath + '/' + mod.name + '/src/**/*.styl'])
+        .pipe(plumber())
         .pipe(stylus({
           use: nib(),
           sourcemap: {
