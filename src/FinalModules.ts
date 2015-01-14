@@ -87,8 +87,6 @@ class FinalModules {
       .replace(/\'/g, '\\\'');
   }
 
-
-
   private getWatchTsTask(gulp:IGulp.Gulp, mod:FinalModule):()=>void {
     return ():void => {
       gulp.watch(this.modulesPath + '/' + mod.name + '/src/**/*.ts', ():void => {
