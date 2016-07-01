@@ -1,6 +1,6 @@
 {
   "name": "final-modules",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "FinalModules is a gulp task generator helper class. Convention over Configuration",
   "main": "build/FinalModules.js",
   "scripts": {
