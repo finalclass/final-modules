@@ -179,7 +179,8 @@ class FinalModules {
           sourcemap: true,
           sourceRoot: '',
           declaration: true,
-          out: mod.name + '.js'
+          out: mod.name + '.js',
+          rootDir: this.modulesPath
         }))
         .pipe(gulp.dest(outDir));
     };
