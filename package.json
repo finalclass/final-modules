@@ -25,7 +25,7 @@
     "gulp-plumber": "^0.6.6",
     "gulp-sourcemaps": "~1.2.4",
     "gulp-stylus": "~1.3.3",
-    "gulp-tsc": "~0.9.2",
+    "gulp-tsc": "0.9.5",
     "gulp-uglifyjs": "~0.4.4",
     "gulp-util": "~3.0.1",
     "gulp-wrap": "~0.5.0",
