@@ -61,7 +61,7 @@ var FinalModules = (function () {
         gulp.task('fm:watch:styl', this.map(function (mod) { return 'fm:' + mod.name + ':watch:styl'; }));
         gulp.task('fm:watch:html', this.map(function (mod) { return 'fm:' + mod.name + ':watch:html'; }));
         gulp.task('fm:watch', ['fm:watch:ts', 'fm:watch:styl', 'fm:watch:html']);
-        gulp.task('fm', ['fm:clean', 'fm:styl', 'fm:min', 'fm:html', 'fm:watch']);
+        gulp.task('fm', ['fm:styl', 'fm:min', 'fm:html', 'fm:watch']);
     };
     FinalModules.varNameFilter = function (filePath) {
         return path.basename(filePath, '.html').replace(/[^a-zA-Z0-9\_\.]+/g, '-').replace(/-([a-z])/g, function (g) {
@@ -147,7 +147,8 @@ var FinalModules = (function () {
                 sourcemap: true,
                 sourceRoot: '',
                 declaration: true,
-                out: mod.name + '.js'
+                out: mod.name + '.js',
+                rootDir: _this.modulesPath
             })).pipe(gulp.dest(outDir));
         };
     };
